@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 const Statistics = ({good, neutral, bad}) => {
   const total = good + neutral + bad
-  const averagePoints = (good - bad) / total
-  const positivePoints = (good / total) * 100
+  const averagePoints = ((good - bad) / total).toFixed(1)
+  const positivePoints = `${((good / total) * 100).toFixed(1)} %`
 
   if (total === 0) {
     return <p>No feedback given.</p>
@@ -12,18 +12,29 @@ const Statistics = ({good, neutral, bad}) => {
   return (
     <>
       <h1>Statistics</h1>
-      <StatisticLine label="Good" value={good} />
-      <StatisticLine label="Neutral" value={neutral} />
-      <StatisticLine label="Bad" value={bad} />
-      <StatisticLine label="All" value={total} />
-      <StatisticLine label="Average" value={averagePoints} />
-      <StatisticLine label="Positive" value={positivePoints} />
+      <table>
+        <tbody>
+          <StatisticLine label="Good" value={good} />
+          <StatisticLine label="Neutral" value={neutral} />
+          <StatisticLine label="Bad" value={bad} />
+          <StatisticLine label="All" value={total} />
+          <StatisticLine label="Average" value={averagePoints} />
+          <StatisticLine label="Positive" value={positivePoints} />
+        </tbody>
+      </table>
+ 
     </>
   )
 }
 
-const StatisticLine = ({label, value}) =>
-  <div>{label}: {value}</div>
+const StatisticLine = ({label, value}) => {
+  return (
+    <tr>
+      <td>{label}</td>
+      <td>{value}</td>
+    </tr>
+  )
+}
 
 const Button = ({onClick, text}) => 
   <button onClick={onClick}>{text}</button>
