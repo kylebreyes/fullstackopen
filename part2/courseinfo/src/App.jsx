@@ -18,8 +18,6 @@ const Total = ({ parts }) => {
     return total += current.exercises 
   }, 0)
 
-  console.log("Total: ", sum);
-
   return (
     <p>
       <b>Total: {sum}</b>
