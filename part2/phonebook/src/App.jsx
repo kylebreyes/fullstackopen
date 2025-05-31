@@ -29,8 +29,11 @@ const App = () => {
       return
     }
 
-    clearInput()
-    setPersons(persons.concat({ name: newName, number: newNumber}))
+    axios.post('http://localhost:3001/persons', {name: newName, number: newNumber})
+      .then(response => {
+        clearInput()
+        setPersons(persons.concat(response.data))
+      })
   }
 
   // Clearing form inputs
