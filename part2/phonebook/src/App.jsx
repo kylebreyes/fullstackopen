@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/personService'
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterInput, setFilterInput] = useState('')
+  const [notification, setNotification] = useState(null)
  
   useEffect(() => {
     personService.getAll()
@@ -22,21 +24,22 @@ const App = () => {
     const existingContact = persons.find(persons => persons.name.toLowerCase() === newName.toLowerCase())
 
     if (existingContact) {
-      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+      if (confirm(`${existingContact.name} is already added to phonebook, replace the old number with a new one?`)) {
         const updatedNumberObj = { ...existingContact, number: newNumber }      
         personService.updateNumber(existingContact.id, updatedNumberObj)
          .then(updatedContact => {
             setPersons(persons.map(p => p.id === updatedContact.id ? updatedContact : p))
          })
       }
-      clearInput()
     } else {
       personService.addNumber({name: newName, number: newNumber})
         .then(newContact => {
-          clearInput()
+          setNotification(`Added ${newContact.name}`)
           setPersons(persons.concat(newContact))
+          setTimeout(() => setNotification(null), 5000)
         })
     }
+    clearInput()
   }
 
   const handleDelete = (id) => {
@@ -51,7 +54,7 @@ const App = () => {
   }
 
   // Clearing form inputs
-  const clearInput = () =>{
+  const clearInput = () => {
     setNewName('')
     setNewNumber('')
   }
@@ -61,6 +64,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification}/>
       <Filter onChange={(e) => setFilterInput(e.target.value)} value={filterInput}/>
       <h2>Add a New</h2>
       <PersonForm 
