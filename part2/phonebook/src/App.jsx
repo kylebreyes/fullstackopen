@@ -34,6 +34,17 @@ const App = () => {
       })
   }
 
+  const handleDelete = (id) => {
+    const person = persons.find(p => p.id === id)
+
+    if (confirm(`Delete ${person.name}?`)) {
+      personService.deleteNumber(id)
+        .then(deletedContact => {
+          setPersons(persons.filter(p => p.id !== deletedContact.id))
+        })
+    }
+  }
+
   // Clearing form inputs
   const clearInput = () =>{
     setNewName('')
@@ -55,7 +66,7 @@ const App = () => {
         numVal={newNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} onDelete={handleDelete}/>
     </div>
   )
 }
