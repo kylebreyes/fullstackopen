@@ -19,19 +19,24 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    const isExisiting = persons.some(persons => persons.name.toLowerCase() === newName.toLowerCase())
+    const existingContact = persons.find(persons => persons.name.toLowerCase() === newName.toLowerCase())
 
-    if (isExisiting) {
-      alert(`${newName} is already added to phonebook`)
+    if (existingContact) {
+      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedNumberObj = { ...existingContact, number: newNumber }      
+        personService.updateNumber(existingContact.id, updatedNumberObj)
+         .then(updatedContact => {
+            setPersons(persons.map(p => p.id === updatedContact.id ? updatedContact : p))
+         })
+      }
       clearInput()
-      return
+    } else {
+      personService.addNumber({name: newName, number: newNumber})
+        .then(newContact => {
+          clearInput()
+          setPersons(persons.concat(newContact))
+        })
     }
-
-    personService.addNumber({name: newName, number: newNumber})
-      .then(newContact => {
-        clearInput()
-        setPersons(persons.concat(newContact))
-      })
   }
 
   const handleDelete = (id) => {
