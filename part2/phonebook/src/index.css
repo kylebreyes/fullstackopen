@@ -1,5 +1,13 @@
 .valid-notif {
   color: green;
+}
+
+.error-notif {
+  color: red;
+}
+
+.valid-notif,
+.error-notif {
   background: lightgrey;
   font-size: 20px;
   border-style: solid;

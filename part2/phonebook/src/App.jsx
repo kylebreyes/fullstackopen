@@ -6,12 +6,13 @@ import Persons from './components/Persons'
 import personService from './services/personService'
 
 const App = () => {
-  const [persons, setPersons] = useState([]) 
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterInput, setFilterInput] = useState('')
   const [notification, setNotification] = useState(null)
- 
+  const [valid, setValid] = useState(false)
+
   useEffect(() => {
     personService.getAll()
       .then(initialContacts => setPersons(initialContacts))
@@ -25,16 +26,23 @@ const App = () => {
 
     if (existingContact) {
       if (confirm(`${existingContact.name} is already added to phonebook, replace the old number with a new one?`)) {
-        const updatedNumberObj = { ...existingContact, number: newNumber }      
+        const updatedNumberObj = { ...existingContact, number: newNumber }
         personService.updateNumber(existingContact.id, updatedNumberObj)
-         .then(updatedContact => {
+          .then(updatedContact => {
             setPersons(persons.map(p => p.id === updatedContact.id ? updatedContact : p))
-         })
+          })
+          .catch(error => {
+            setNotification(`Information about ${updatedNumberObj.name} has already been removed from the server`)
+            setValid(false)
+            setPersons(persons.filter(person => person.id !== updatedNumberObj.id))
+            setTimeout(() => setNotification(null), 5000)
+          })
       }
     } else {
-      personService.addNumber({name: newName, number: newNumber})
+      personService.addNumber({ name: newName, number: newNumber })
         .then(newContact => {
           setNotification(`Added ${newContact.name}`)
+          setValid(true)
           setPersons(persons.concat(newContact))
           setTimeout(() => setNotification(null), 5000)
         })
@@ -64,10 +72,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification}/>
-      <Filter onChange={(e) => setFilterInput(e.target.value)} value={filterInput}/>
+      <Notification message={notification} valid={valid} />
+      <Filter onChange={(e) => setFilterInput(e.target.value)} value={filterInput} />
       <h2>Add a New</h2>
-      <PersonForm 
+      <PersonForm
         submitHandler={handleSubmit}
         nameHandler={(e) => setNewName(e.target.value)}
         numberHandler={(e) => setNewNumber(e.target.value)}
@@ -75,7 +83,7 @@ const App = () => {
         numVal={newNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} onDelete={handleDelete}/>
+      <Persons persons={personsToShow} onDelete={handleDelete} />
     </div>
   )
 }
